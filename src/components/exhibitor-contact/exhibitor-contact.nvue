@@ -1,0 +1,97 @@
+<!-- 展商详情中的联络 -->
+<template>
+	<view class="exhibitor-details">
+		<view v-if="options.toLinkName">
+		<card-list>
+			<view class="exhibitor-item-material" slot="content">
+				<text class="exhibitor-item company">联络人：{{options.toLinkName}}</text>
+				<text class="exhibitor-item abbreviation">联络时间：{{options.linkDateTime | formatDate(11)}}</text>
+				<text class="exhibitor-item num">联络方式：{{options.linkType}}</text>
+				<view class="contact-details">
+					<text class="contact-details-item">销售进度：{{options.atrSaleIndex}}%</text>
+					<text class="contact-details-item">预估面积：{{options.expectedArea}}平米</text>
+					<text class="contact-details-item">下次联络时间：{{options.linkNextDateTime }}</text>
+					<text class="contact-details-item">业务员：{{options.fromLinkName}}</text>
+				</view>
+				<view class="contact-details">
+					<text class="contact-details-item mark">{{options.remark}}</text>
+				</view>
+			</view>
+		</card-list>
+		</view>
+		<view v-if="!options.toLinkName">
+			<view class="exhibitor-item-material">
+				<no-data isHint="true"></no-data>
+			</view>
+		</view>
+
+	</view>
+</template>
+
+<script>
+	import cardList from '@/components/card-list/card-list.nvue';
+	import noData from "@/components/no-data/no-data.vue"
+	export default {
+		components: {
+			cardList,
+			noData
+		},
+		props: {
+			options: {
+				type: Object,
+				default () {
+					return {};
+				}
+			},
+			tabIndex: {
+				type: Number,
+				default: 0
+			}
+		},
+		data() {
+			return {};
+		},
+		created() {}
+	};
+</script>
+
+<style>
+	.exhibitor-details {
+		margin-right: 30rpx;
+		margin-left: 30rpx;
+	}
+
+	.exhibitor-item-material {
+		padding: 24rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		color: rgba(0, 0, 0, 0.65);
+	}
+
+	.company {
+		font-size: 36rpx;
+		font-weight: 400;
+		color: rgba(0, 0, 0, 0.65);
+	}
+
+	.exhibitor-item {
+		margin-top: 8rpx;
+		font-size: 30rpx;
+		color: rgba(0, 0, 0, 0.65);
+	}
+
+	.contact-details {
+		margin-top: 48rpx;
+	}
+
+	.contact-details-item {
+		font-size: 24rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		color: rgba(0, 0, 0, 0.4);
+		margin-bottom: 8rpx;
+	}
+
+	.mark {
+		color: rgba(0, 0, 0, 0.65);
+	}
+</style>

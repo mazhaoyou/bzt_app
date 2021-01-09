@@ -1,0 +1,78 @@
+<template>
+	<view class="container">
+		<view class="container-item" v-if="tabIndex == 0">
+			<exhibitor-datum :options="dataList"></exhibitor-datum>
+		</view>
+		<view class="container-item" v-if="tabIndex == 1">
+			<exhibitor-contact :options="dataList"></exhibitor-contact>
+		</view>
+		<view class="container-item" v-if="tabIndex == 2">
+			<exhibitor-contract :options="dataList"></exhibitor-contract>
+		</view>
+		<view class="container-item" v-if="tabIndex == 3">
+			<exhibitor-payment  :options="dataList"></exhibitor-payment>
+		</view>
+		<view class="container-item" v-if="tabIndex == 4">
+			<exhibitor-reserve  :options="dataList"></exhibitor-reserve>
+		</view>
+	</view>
+</template>
+
+<script>
+	import exhibitorDatum from '@/components/exhibitor-datum/exhibitor-datum.nvue';
+	import exhibitorContact from '@/components/exhibitor-contact/exhibitor-contact.nvue';
+	import exhibitorContract from '@/components/exhibitor-contract/exhibitor-contract.nvue';
+	import exhibitorPayment from '@/components/exhibitor-payment/exhibitor-payment.nvue';
+	import exhibitorReserve from '@/components/exhibitor-reserve/exhibitor-reserve.nvue';
+	export default {
+		components: {
+			exhibitorDatum,
+			exhibitorContact,
+			exhibitorContract,
+			exhibitorPayment,
+			exhibitorReserve
+		},
+		props: {
+			listItems: {
+				type: Object,
+				default() {
+					return {};
+				}
+			},
+			tabIndex: {
+				type: Number,
+				default: 0
+			}
+		},
+		data() {
+			return {
+				dataList:''
+			};
+		},
+		onReady() {
+			this.dataList = this.listItems;
+		},
+		created() {
+			this.dataList = this.listItems;
+			
+		},
+		watch:{
+		   listItems(){
+			   this.dataList = this.listItems;
+		   }	
+		}
+	};
+</script>
+
+<style scoped>
+	.container {
+		flex: 1;
+		flex-direction: column;
+		width: 750rpx;
+	}
+
+	.container-item {
+		width: 750rpx;
+		/* margin-bottom: 24rpx; */
+	}
+</style>

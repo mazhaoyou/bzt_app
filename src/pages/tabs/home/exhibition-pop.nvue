@@ -1,0 +1,296 @@
+<!-- 展会选择框 -->
+<template>
+	<view v-show="show">
+		<view class="pop-mark"></view>
+		<view class="e-pop-view">
+			<view class="e-select-view" ref="popView" :style="{'margin-top':barHeight +'px'}">
+				<view @click="showSelect" class="e-pop-row-view">
+					<text class="e-select-text">{{getExhInfo.exhName}}</text><text class="iconfont">&#xe64c;</text>
+				</view>
+			</view>
+			<view class="e-pop-title-view">
+				<text class="e-pop-title1">请选择账号</text>
+				<text class="e-pop-title2">{{getUserInfo.stfFullName}}</text>
+				<text class="e-pop-title1">管理的展会</text>
+			</view>
+			<scroll-view class="e-pop-scroll" scroll-y>
+				<pop-item v-for="item in getExhList" :key="item.exhId" :item="item" :select="item.exhId == selectItem.exhId" @clickItem="clickItem(item)"></pop-item>
+			</scroll-view>
+			<view class="click-view">
+				<view class="cancel-btn">
+					<text class="click-btn-text" @click="clickCancel">取消</text>
+				</view>
+				<view class="ok-btn">
+					<text class="click-btn-text" @click="clickDone">确定</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import popItem from "./exhibition-pop-item"
+	import http from "../../../common/http/"
+	import storage from "../../../common/storage/storage.js"
+	import util from "../../../common/util.js"
+	import store from "../../../store/index.js"
+	import {
+		mapState,
+		mapGetters,
+		mapMutations
+	} from 'vuex'
+	export default {
+		components: {
+			popItem
+		},
+		props: {
+			list: {
+				type: Array,
+				default: () => {
+					return []
+				}
+			},
+			show: {
+				type: Boolean,
+				default: false
+			}
+		},
+		data() {
+			return {
+				selectID: '',
+				selectItem: {exhId: ''}, // TODO: 赋值默认值
+				dataList: [],
+				userInfo: {stfFullName: ''},
+				barHeight: 20
+				// currentExhName: store.state.exhibitor.exhInfo.exhName
+			}
+		},
+		computed:{
+			...mapGetters(['getExhInfo', 'getExhList', 'getUserInfo'])
+		},
+		onShow() {
+			// #ifdef APP-PLUS-NVUE
+			let domModule = weex.requireModule('dom');
+			domModule.addRule('fontFace', {
+				fontFamily: 'iconfont',
+				src: "url('https://at.alicdn.com/t/font_1503209_44ahpf3yvgu.ttf')"
+			});
+			// #endif
+			var userInfo = storage.getStorage("userInfo", 2)
+			if (userInfo === "") {
+				return
+			}
+			// store.dispatch("getExhListRequest", true) // 获取展商列表
+			// this.getData()
+			// this.currentUserInfo()
+		},
+		mounted () {
+			uni.$on('showSelectExhPop', () => {
+				this.clickItem(this.getExhInfo)
+			})
+			this.getSystemStatusBarHeight()
+		},
+		methods: {
+			...mapMutations(['changeExhInfo']),
+			clickItem(item) {
+				this.selectID = item.exhId
+				this.selectItem = item
+			},
+			showSelect() {
+				uni.getSubNVueById('selectPop').hide()
+			},
+			clickCancel() {
+				uni.getSubNVueById('selectPop').hide()
+			},
+			clickDone() {
+				uni.$emit('e-pop', {
+					type: 'done',
+					info: this.selectItem
+				})
+				this.undateCurrentExh()
+				this.changeExhInfo(this.selectItem)
+			},
+			/**
+			 * 【获取数据相关】
+			 * */
+			getData() {
+				http.getExhibitionList().then(res => {
+					var code = res.data.code
+					if (code === 1000) {
+						this.dataList = res.data.data
+						this.clickItem(this.getExhInfo)
+						return
+					}
+					util.toast(res.data.msg)
+				})
+				.catch(err => {})
+			},
+			undateCurrentExh () {
+				var exhId = this.selectItem.exhId
+				var accessToken = this.getUserInfo['access_token']
+				var alias = util.getPushAlias(accessToken, true)
+				var params = {
+					exhId: exhId,
+					registrationId: alias
+				}
+				http.upDateCurrentExh(params).then(res => {
+					var code = res.data.code
+					if (code === 1000) {
+						return
+					}
+					util.toast(res.data.msg)
+				})
+				.catch(err => {})
+			},
+			/* 获取当前用户信息 */
+			currentUserInfo () {
+				http.getCurrentUserInfo().then(res => {
+					let data = res.data;
+					if (data.code != 1000) {
+						util.toast(res.data.msg)
+						return
+					}
+					this.userInfo =data.data;
+				});
+			},
+			getSystemStatusBarHeight () {
+				// #ifdef APP-PLUS
+				var height = plus.navigator.getStatusbarHeight();
+				this.barHeight = height;
+				// #endif
+				// #ifdef H5
+				this.barHeight = 0;
+				// #endif
+				console.log("【barHeight】")
+				console.log(this.barHeight)
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.e-pop-view {
+		height: 300px;
+		width: 750rpx;
+		flex-direction: column;
+		z-index: 9990;
+		position: fixed;
+		/* #ifndef APP-PLUS */
+		top: 0;
+		/* #endif */
+		background-image: linear-gradient(to left, rgba(88, 45, 233, 1) 0%, rgba(64, 123, 235, 1) 100%);
+	}
+
+	.e-pop-title-view {
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-end;
+		margin-bottom: 40rpx;
+		margin-top: 47rpx;
+		margin-right: 24rpx;
+	}
+
+	.e-pop-title1 {
+		font-size: 24rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		color: #FFFFFF;
+	}
+
+	.e-pop-title2 {
+		font-size: 24rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		color: #3AF4A9;
+	}
+
+	.pop-mark {
+		width: 750rpx;
+		height: 100vh;
+		background-color: rgba(0, 0, 0, 0.6);
+		position: fixed;
+		top: 64px;
+		left: 0;
+		z-index: 9980;
+	}
+
+	.e-select-view {
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-end;
+		padding-top: 30rpx;
+	}
+
+	.e-select-text {
+		font-size: 36rpx;
+		color: #FFFFFF;
+		font-family: PingFangSC-Medium, PingFang SC;
+		font-weight: 500;
+	}
+
+	.iconfont {
+		font-size: 24rpx;
+		margin-left: 22rpx;
+		color: #FFFFFF;
+		margin-right: 30rpx;
+	}
+
+	.click-view {
+		/* align-self: flex-end; */
+		flex-direction: row;
+		justify-content: flex-end;
+		align-items: center;
+		padding-bottom: 10rpx;
+		padding-top: 10rpx;
+	}
+
+	.cancel-btn {
+		width: 132rpx;
+		height: 48rpx;
+		border-radius: 24rpx;
+		border-width: 1px;
+		border-style: solid;
+		border-color: #FFFFFF;
+		color: #FFFFFF;
+		background-color: transparent;
+		font-size: 26rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		text-align: center;
+		justify-content: center;
+	}
+
+	.ok-btn {
+		width: 132rpx;
+		height: 48rpx;
+		background-color: #3AF4A9;
+		border-radius: 24rpx;
+		color: #FFFFFF;
+		border-color: #3AF4A9;
+		font-size: 26rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		text-align: center;
+		justify-content: center;
+		margin-right: 30rpx;
+		margin-left: 24rpx;
+	}
+
+	.click-btn-text {
+		color: #FFFFFF;
+		font-size: 26rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		text-align: center;
+	}
+
+	.e-pop-scroll {
+		/* height: 150px; */
+		overflow: hidden;
+		flex: 1;
+	}
+
+	.e-pop-row-view {
+		flex-direction: row;
+	}
+</style>

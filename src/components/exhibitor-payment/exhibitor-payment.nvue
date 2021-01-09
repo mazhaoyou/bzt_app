@@ -1,0 +1,143 @@
+<!-- 展商详情中的付款 -->
+<template>
+	<view class="exhibitor-details">
+		<original-point text="认领款项请到电脑端展立方操作"></original-point>
+		<view v-if="options.benchPayPlanList.length > 0">
+			<view class="exhibitor-contract-titel card-list-title"><text class="contract-date-time">付款计划</text></view>
+			<view v-for="item in options.benchPayPlanList" :key="item.ppnId">
+				<view class="exhibitor-item-material">
+					<text class="contract-item ">所属合同：{{item.odrName}}</text>
+					<text class="contract-item ">付款计划名称：{{item.ppnName}}</text>
+					<text class="contract-item-details">付款金额：{{item.ppnAmountRmb | toDecimal2 }}</text>
+					<text class="contract-item-details">付款截止日期：{{item.ppnCreateTime}}</text>
+					<text class="contract-item-details">付款比例：{{item.ppnPercent}}</text>
+					<text class="contract-item-details">付款状态：{{item.state}}</text>
+				</view>
+			</view>
+
+		</view>
+		<view v-if="options.benchPayRecordList.length > 0">
+			<view class="exhibitor-contract-titel card-list-title"><text class="contract-date-time">付款记录</text></view>
+			<view v-for="item in options.benchPayRecordList" :key="item.prdID">
+				<view class="exhibitor-item-material">
+					<text class="contract-item ">付款公司：{{item.atrName }}</text>
+					<text class="contract-item ">付款名称：{{item.prdName }}</text>
+					<text class="contract-item-details">付款金额：{{item.prdTotal }}</text>
+					<text class="contract-item-details">付款时间：{{item.prdPayTime }}</text>
+					<text class="contract-item-details">发票抬头：{{item.prdInvoiceHead}}</text>
+					<text class="contract-item-details">币种：{{item.prdMoneyType}}</text>
+					<text class="contract-item-details">剩余金额：{{item.remainingMoney}}</text>
+					<text class="contract-item-details">所属展商：{{item.atrActorName}}</text>
+					<text class="contract-item-details">付款状态：{{item.state}}</text>
+				</view>
+			</view>
+
+		</view>
+
+	</view>
+</template>
+
+<script>
+	import originalPoint from '@/components/original-point/original-point.nvue';
+	import filters from "../../common/filters.js"
+	export default {
+		components: {
+			originalPoint
+		},
+		props: {
+			options: {
+				type: Object,
+				default () {
+					return {
+						benchPayPlanList: [],
+						benchPayRecordList: []
+					};
+				}
+			},
+			tabIndex: {
+				type: Number,
+				default: 0
+			}
+		},
+		data() {
+			return {};
+		},
+		created() {
+
+		}
+	};
+</script>
+
+<style>
+	.exhibitor-details {
+		margin-right: 30rpx;
+		margin-left: 30rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		margin-top: 24rpx;
+	}
+
+	.exhibitor-contract-titel {
+		flex-direction: row;
+		padding: 16rpx;
+		padding-right: 24rpx;
+		justify-content: flex-end;
+		flex: 1;
+		align-items: center;
+	}
+
+	.contract-date-time {
+		font-size: 28rpx;
+		font-weight: 500;
+		color: rgba(0, 0, 0, 0.65);
+	}
+
+	.exhibitor-item-material {
+		padding: 24rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		color: rgba(0, 0, 0, 0.65);
+		background-color: rgba(255, 255, 255, 1);
+		border-radius: 8rpx;
+		margin-top: 1rpx;
+	}
+
+	.contract-item {
+		font-size: 30rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		color: rgba(0, 0, 0, 0.65);
+		margin-bottom: 8rpx;
+	}
+
+	.contract-item-details {
+		font-size: 24rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		color: rgba(0, 0, 0, 0.4);
+	}
+
+	.line-h {
+		height: 1rpx;
+		background-color: #007AFF;
+		width: 750rpx;
+	}
+
+	.card-list-title {
+		flex-direction: row;
+		margin-top: 16rpx;
+		background-color: rgba(255, 255, 255, 1);
+		border-radius: 10rpx;
+		align-items: center;
+		margin-bottom: 4rpx;
+	}
+
+	.card-list-content {
+		background-color: rgba(255, 255, 255, 1);
+		border-radius: 8rpx;
+	}
+
+	.line-h {
+		height: 1rpx;
+		background-color: #007AFF;
+		width: 750rpx;
+	}
+</style>

@@ -1,0 +1,601 @@
+<template>
+	<view class="tabs">
+		<scroll-view id="tab-bar" class="scroll-h" :scroll-x="false" :show-scrollbar="false" :scroll-into-view="scrollInto">
+			<view v-for="(tab,index) in tabBars" :key="tab.id" class="uni-tab-item" :id="tab.id" :data-current="index" @click="ontabtap">
+				<text class="uni-tab-item-title" :class="tabIndex==index ? 'uni-tab-item-title-active' : ''">{{tab.name}}</text>
+			</view>
+		</scroll-view>
+		<swiper :current="tabIndex" class="swiper-box" style="flex: 1;" :duration="300" @change="ontabchange">
+
+			<swiper-item class="swiper-item" v-for="(tab,index1) in dataList" :key="index1">
+				<!-- #ifdef APP-NVUE -->
+				<list class="scroll-v list" enableBackToTop="true" loadmoreoffset="15">
+					<!-- <refresh class="refresh" @refresh="onrefresh(index1)" @pullingdown="onpullingdown" :display="tab.refreshing ? 'show' : 'hide'">
+						<div class="refresh-view">
+							<image class="refresh-icon" :src="refreshIcon" :style="{width: (tab.refreshing || pulling) ? 0: '30px'}" :class="{'refresh-icon-active': tab.refreshFlag}"></image>
+							<loading-indicator class="loading-icon" animating="true" v-if="tab.refreshing"></loading-indicator>
+							<text class="loading-text">{{tab.refreshText}}</text>
+						</div>
+					</refresh> -->
+
+					<cell v-for="item in tab.data" :key="item.atrId" v-if="tab.data.length>0">
+						<exhibitor-item :tabIndex="tabIndex" :listItems="item"></exhibitor-item>
+					</cell>
+					<cell v-if="tab.data.length==0">
+						<exhibitor-item :tabIndex="tabIndex"></exhibitor-item>
+					</cell>
+				</list>
+				<!-- #endif -->
+				<!-- #ifndef APP-NVUE -->
+				<!-- <scroll-view class="scroll-v list" enableBackToTop="true" scroll-y @scrolltolower="loadMore(index1)">
+					<view v-for="newsitem in tab.data" :key="newsitem.id">
+						<exhibitor-item :options="newsitem" :tabIndex="tabIndex"></exhibitor-item>
+					</view>
+					<view class="loading-more" v-if="tab.isLoading || tab.data.length > 4">
+						<text class="loading-more-text">{{tab.loadingText}}</text>
+					</view>
+				</scroll-view> -->
+				<!-- #endif -->
+			</swiper-item>
+		</swiper>
+		<view class="bottom-menu" v-if="tabIndex ==0">
+			<text class="menu-item" @click="skipAddPage('append-exhibitor/append-exhibitor',0,true)">编辑资料</text>
+			<text class="menu-line"></text>
+			<text class="menu-item" @click="skipAddPage('append-liaisons/append-liaisons',1)">新增联络人</text>
+		</view>
+		<view class="bottom-menu"  v-if="tabIndex ==1" @click="skipAddPage('append-contact/append-contact',2)">
+			<text class="menu-item">新增联络</text>
+		</view>
+		<view class="bottom-menu" v-if="tabIndex ==4">
+			<text class="menu-item" @click="skipAddPage('reserve-booth/reserve-booth',3)">预定展位</text>
+			<text class="menu-line"></text>
+			<text class="menu-item" @click="skipAddPage('reserve-service/reserve-service',4)">预定服务</text>
+		</view>
+	</view>
+</template>
+<script>
+	import exhibitorItem from "@/components/exhibitor-item/exhibitor-item.nvue"
+	import http from "@/common/http/index.js"
+	import util from "@/common/util.js"
+	// 缓存每页最多
+	const MAX_CACHE_DATA = 100;
+	// 缓存页签数量
+	const MAX_CACHE_PAGE = 3;
+	const newsData = {};
+	export default {
+		components: {
+			exhibitorItem
+		},
+		data() {
+			return {
+				requestLock: false,
+				dataList: [],
+				cacheTab: [],
+				tabIndex: 0,
+				tabBars: [{
+					name: '资料',
+					id: 'ziliao'
+				}, {
+					name: '联络',
+					id: 'lianluo'
+				}, {
+					name: '合同',
+					id: 'hetong'
+				}, {
+					name: '付款',
+					id: 'pay'
+				}, {
+					name: '预定',
+					id: 'yuding'
+				}],
+				scrollInto: "",
+				showTips: false,
+				navigateFlag: false,
+				pulling: false,
+				isMenu: true,
+				atrId: "",
+				atrName: "",
+				list: {},
+				refreshIcon: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAB5QTFRFcHBw3Nzct7e39vb2ycnJioqK7e3tpqam29vb////D8oK7wAAAAp0Uk5T////////////ALLMLM8AAABxSURBVHja7JVBDoAgDASrjqj//7CJBi90iyYeOHTPMwmFZrHjYyyFYYUy1bwUZqtJIYVxhf1a6u0R7iUvWsCcrEtwJHp8MwMdvh2amHduiZD3rpWId9+BgPd7Cc2LIkPyqvlQvKxKBJ//Qwq/CacAAwDUv0a0YuKhzgAAAABJRU5ErkJggg=="
+
+			}
+		},
+		onLoad(options) {
+			this.atrId = options.atrId;
+			// this.atrName = options.atrName;
+			if (options.index) {
+				this.requestLock = true
+				this.tabIndex = options.index;
+				this.switchTab(this.tabIndex)
+			}
+			// #ifdef APP-PLUS-NVUE
+			let domModule = weex.requireModule('dom');
+			domModule.addRule('fontFace', {
+				fontFamily: 'iconfont',
+				src: "url('https://at.alicdn.com/t/font_1503209_44ahpf3yvgu.ttf')"
+			});
+			// #endif
+
+			// this.getMaterialData();
+
+			setTimeout(() => {
+				this.tabBars.forEach((tabBar) => {
+					this.dataList.push({
+						data: []
+					});
+				});
+
+			}, 0);
+		},
+		onShow() {
+			if (this.requestLock) {
+				return
+			}
+			this.getList(this.tabIndex);
+		},
+		methods: {
+			getList(index) {
+				if (index == 0 && !util.getPrivilegeById("p200000201")) {
+					util.showModal('','暂无该权限',()=>{
+						uni.navigateBack();
+					});
+					return;
+				}
+				if (index == 0) {
+					this.getMaterialData();
+				}
+				if (index == 1) {
+					this.getLinks();
+				}
+				if (index == 2) {
+					this.getContractList();
+				}
+				if (index == 3) {
+					this.getPayList();
+				}
+				if (index == 4) {
+					this.getBookingList();
+				}
+			},
+			ontabtap(e) {
+				let index = e.target.dataset.current || e.currentTarget.dataset.current;
+				this.switchTab(index);
+			},
+			ontabchange(e) {
+				// #ifdef APP-PLUS
+				let index = e.target.current || e.detail.current;
+				this.switchTab(index);
+				// #endif
+
+			},
+			switchTab(index) {
+				if (index == 0 && !util.getPrivilegeById("p200000201")) {
+					util.showModal("");
+					return;
+				}
+				if (index == 1 && !util.getPrivilegeById("p200000202")) {
+					util.showModal("");
+					return;
+				}
+				if (index == 2 && !util.getPrivilegeById("p200000203")) {
+					util.showModal("");
+					return;
+				}
+				if (index == 3 && !util.getPrivilegeById("p200000204")) {
+					util.showModal("");
+					return;
+				}
+				if (index == 4 && !util.getPrivilegeById("p200000205")) {
+					util.showModal("");
+					return;
+				}
+				this.getList(index);
+				
+				/*  if (this.dataList[index].data.length === 0) {
+                    this.getList(index);
+                }
+
+                if (this.tabIndex === index) {
+                    return;
+                }
+
+                // 缓存 tabId
+                if (this.dataList[this.tabIndex].data.length > MAX_CACHE_DATA) {
+                    let isExist = this.cacheTab.indexOf(this.tabIndex);
+                    if (isExist < 0) {
+                        this.cacheTab.push(this.tabIndex);
+                        //console.log("cache index:: " + this.tabIndex);
+                    }
+                }
+ */
+				this.tabIndex = index;
+				this.scrollInto = this.tabBars[index].id;
+
+				// 释放 tabId
+				if (this.cacheTab.length > MAX_CACHE_PAGE) {
+					let cacheIndex = this.cacheTab[0];
+					this.clearTabData(cacheIndex);
+					this.cacheTab.splice(0, 1);
+					//console.log("remove cache index:: " + cacheIndex);
+				}
+			},
+			clearTabData(e) {
+				this.dataList[e].data.length = 0;
+				this.dataList[e].loadingText = "加载更多...";
+			},
+			newGuid() {
+				let s4 = function() {
+					return (65536 * (1 + Math.random()) | 0).toString(16).substring(1);
+				}
+				return (s4() + s4() + "-" + s4() + "-4" + s4().substr(0, 3) + "-" + s4() + "-" + s4() + s4() + s4()).toUpperCase();
+			},
+			/* 跳转详情页面 */
+			skipAddPage(url, index, editEx) {
+				console.log(url)
+				let item = JSON.stringify(this.dataList[0].data);
+				if (index == 0 && !util.getPrivilegeById("p20000020101")) {
+					util.showModal("","您目前没有新增展商权限");
+					return;
+				}
+				if (index == 1 && !util.getPrivilegeById("p20000020102")) {
+					util.showModal("","您目前没有新增联络人权限");
+					return;
+				}
+				if (index == 2 && !util.getPrivilegeById("p20000020201")) {
+					util.showModal("","您目前没有新增联络权限");
+					return;
+				}
+				if (index == 3 && !util.getPrivilegeById("p20000020501")) {
+					util.showModal("","您目前没有预订展位权限");
+					return;
+				}
+				if (index == 4 && !util.getPrivilegeById("p20000020502")) {
+					util.showModal("","您目前没有预订服务权限");
+					return;
+				}
+				if (editEx) {
+					url = `/pages/${url}?editEx=${this.editEx}&info=${item}`;
+				} else {
+					url = `/pages/${url}?atrId=${this.atrId}&atrName=${this.atrName}`
+				}
+				uni.navigateTo({
+					url: url
+				})
+
+			},
+			/* 资料 */
+			getMaterialData() {
+				let arg = {
+					atrId: this.atrId
+				}
+				http.getActorDataDetail(arg).then(res => {
+					let data = res.data;
+					if (data.code == "1000") {
+						let item = data.data;
+						this.atrName = item.atrName;
+						let targetData = {
+							atrId: item.atrId,
+							atrName: util.fieldProtaction(item.atrName),
+							atrSName: util.fieldProtaction(item.atrSName),
+							bthCode: util.fieldProtaction(item.bthCode),
+							atrCountry: item.atrCountry,
+							atrProvince: item.atrProvince,
+							atrCity: item.atrCity,
+							atrTel: util.fieldProtaction(item.atrTel),
+							atrEmail: util.fieldProtaction(item.atrEmail),
+							atrFiStatu: util.fieldProtaction(item.atrFiStatu),
+							atrSaleName: util.fieldProtaction(item.atrSaleName),
+							sortID: item.sortID,
+							sortName: util.fieldProtaction(item.sortName),
+							tradeID: item.tradeID,
+							tradeName: util.fieldProtaction(item.tradeName),
+							dataList: item.dataList.map((info) => {
+								return {
+									id: info.id,
+									contactName: util.fieldProtaction(info.contactName),
+									gender: info.gender,
+									position: util.fieldProtaction(info.position),
+									address: util.fieldProtaction(info.address),
+									mobile: util.fieldProtaction(info.mobile),
+									tele: util.fieldProtaction(info.tele),
+									mail: util.fieldProtaction(info.mail),
+									psnType: info.psnType,
+									dept: info.dept,
+									psnCountry: info.psnCountry,
+									psnProvince: info.psnProvince,
+									psnCity: info.psnCity
+								}
+							})
+						}
+						let activeTab = this.dataList[0];
+						activeTab.data = [];
+						activeTab.data = activeTab.data.concat(targetData);
+					} else {
+						util.toast(data.msg);
+					}
+				})
+			},
+			/* 联络 */
+			getLinks() {
+				let arg = {
+					atrId: this.atrId
+				}
+				http.getLinksByAtrId(arg).then(res => {
+					let data = res.data;
+					if (data.code == "1000") {
+						const targetData = data.data.map((item) => {
+							return {
+								atrId: item.atrId,
+								linkId: item.linkId,
+								linkDateTime: util.formatDate(item.linkDateTime, 11),
+								linkType: util.fieldProtaction(item.linkType),
+								atrSaleIndex: util.fieldProtaction(item.atrSaleIndex, 0),
+								expectedArea: util.fieldProtaction(item.expectedArea, 0),
+								expectedMoney: item.expectedMoney,
+								linkNextDateTime: util.formatDate(item.linkNextDateTime, 11),
+								fromLinkId: item.fromLinkId,
+								fromLinkName: util.fieldProtaction(item.fromLinkName),
+								toLinkId: item.toLinkId,
+								toLinkName: util.fieldProtaction(item.toLinkName),
+								remark: util.fieldProtaction(item.remark)
+							};
+						});
+
+						let activeTab = this.dataList[1];
+						activeTab.data = [];
+						activeTab.data = activeTab.data.concat(targetData);
+
+					} else {
+						util.toast(data.msg);
+					}
+				})
+			},
+			/* 合同 */
+			getContractList() {
+				let arg = {
+					seeSelfData: [],
+					pageSize: 100,
+					pageIndex: 1,
+					atrId: this.atrId
+				}
+				http.getContractListData(arg).then(res => {
+					let data = res.data;
+					if (data.code == "1000") {
+						let items = data.data.items;
+						let targetData = items.map((item) => {
+							return {
+								odrID: item.odrID,
+								odrCode: item.odrCode,
+								odrCreateTime: util.formatDate(item.odrCreateTime, 11),
+								odrname: util.fieldProtaction(item.odrname),
+								odrComName: util.fieldProtaction(item.odrComName),
+								odrMoney: util.toDecimal2(item.odrMoney),
+								odrReceive: util.toDecimal2(item.odrReceive),
+								stfFullName: util.fieldProtaction(item.stfFullName),
+								dataList: item.dataList.map((info) => {
+									return {
+										odrid: info.odrid,
+										oddsourceid: util.fieldProtaction(info.oddsourceid),
+										oddsource: util.fieldProtaction(info.oddsource),
+										oddTypName: util.fieldProtaction(info.oddTypName),
+										oddsaleprice: util.toDecimal2(info.oddsaleprice),
+										oddprice: util.toDecimal2(info.oddprice),
+										oddnum: util.fieldProtaction(info.oddnum, 0),
+										oddEndPrice: util.toDecimal2(info.oddEndPrice)
+									}
+								})
+							}
+						});
+						let activeTab = this.dataList[2];
+						activeTab.data = [];
+						activeTab.data = activeTab.data.concat(targetData);
+					} else {
+						util.toast(data.msg);
+					}
+				})
+			},
+			/* 获得付款 */
+			getPayList() {
+				let arg = {
+					atrId: this.atrId,
+					atrName: ''
+				}
+				http.getPayMentList(arg).then(res => {
+					let data = res.data;
+					if (data.code == "1000") {
+						let item = data.data;
+						let targetData = {
+							benchPayPlanList: item.benchPayPlanList.map((plan) => {
+								return {
+									ppnId: plan.ppnId,
+									ppnName: plan.ppnName,
+									odrName: util.fieldProtaction(plan.odrName, 0),
+									ppnAmountRmb: util.toDecimal2(plan.ppnAmountRmb),
+									state: plan.state,
+									ppnCreateTime: util.formatDate(plan.ppnCreateTime, 11),
+									ppnPercent: util.fieldProtaction(plan.ppnPercent, 0)
+								}
+							}),
+							benchPayRecordList: item.benchPayRecordList.map((record) => {
+								return {
+									prdID: record.prdID,
+									prdName: record.prdName,
+									state: record.state,
+									prdPayTime: util.formatDate(record.prdPayTime, 11),
+									atrName: record.atrName,
+									prdInvoiceHead: util.fieldProtaction(record.prdInvoiceHead),
+									remainingMoney: util.toDecimal2(record.remainingMoney),
+									atrActorName: util.fieldProtaction(record.atrActorName),
+									prdMoneyType: record.prdMoneyType,
+									prdCreator: record.prdCreator,
+									prdTotal: util.toDecimal2(record.prdTotal)
+								}
+							})
+						}
+
+						let activeTab = this.dataList[3];
+						activeTab.data = [];
+						activeTab.data = activeTab.data.concat(targetData);
+					} else {
+						util.toast(data.msg);
+					}
+				})
+			},
+			getBookingList() {
+				let arg = {
+					AtrID: this.atrId
+				}
+				http.getBookingList(arg).then(res => {
+					let data = res.data;
+					if (data.code == "1000") {
+						let item = data.data;
+						let targetData = {
+							boothEntityList: item.boothEntityList.map((boot) => {
+								return {
+									bthID: boot.bthID,
+									bthCode: boot.bthCode,
+									bthType: boot.bthType,
+									bthArea: util.fieldProtaction(boot.bthArea, 0),
+									bthTotalMoney: util.toDecimal2(boot.bthTotalMoney),
+									unit: boot.unit,
+									room: util.fieldProtaction(boot.room),
+									bthLastOrderTime: util.formatDate(boot.bthLastOrderTime, 11),
+									bthStatus: boot.bthStatus
+								}
+							}),
+							serviceBookList: item.serviceBookList.map((book) => {
+								if (book) {
+									return {
+										srjID: book.srjID,
+										srjName: book.srjName,
+										typName: book.typName,
+										count: util.fieldProtaction(book.count, 0),
+										srjSalePrice: util.toDecimal2(book.srjSalePrice),
+										oddCreateTime: util.formatDate(book.oddCreateTime, 11),
+										srjTotalNum: book.srjTotalNum,
+										typType: book.typType,
+										comName: book.comName,
+										num: book.num
+										
+									}
+								}
+							})
+						}
+						let activeTab = this.dataList[4];
+						activeTab.data = [];
+						activeTab.data = activeTab.data.concat(targetData);
+					} else {
+						util.toast(data.msg);
+					}
+				})
+			}
+		}
+	}
+</script>
+
+<style>
+	/* #ifndef APP-PLUS */
+	page {
+		width: 100%;
+		display: flex;
+	}
+
+	/* #endif */
+
+	.tabs {
+		width: 750rpx;
+		flex: 1;
+		flex-direction: column;
+		overflow: hidden;
+		background-color: #F6F6F6;
+		/* #ifdef MP-ALIPAY || MP-BAIDU */
+		height: 100%;
+		/* #endif */
+	}
+
+	.scroll-h {
+		width: 750rpx;
+		height: 85rpx;
+		flex-direction: row;
+		/* #ifndef APP-PLUS */
+		white-space: nowrap;
+		/* #endif */
+		justify-content: space-around;
+		background-color: #FFFFFF;
+	}
+
+	.line-h {
+		height: 1upx;
+		background-color: #cccccc;
+	}
+
+	.uni-tab-item {
+		/* #ifndef APP-PLUS */
+		display: inline-block;
+		/* #endif */
+		flex-wrap: nowrap;
+		padding-left: 30rpx;
+		padding-right: 30rpx;
+
+	}
+
+	.uni-tab-item-title {
+		color: #555;
+		font-size: 30upx;
+		height: 80upx;
+		line-height: 80upx;
+		padding-bottom: 0 !important;
+		flex-wrap: nowrap;
+		/* #ifndef APP-PLUS */
+		white-space: nowrap;
+
+		/* #endif */
+	}
+
+	.uni-tab-item-title-active {
+		border-bottom-style: solid;
+		border-bottom-width: 4rpx;
+		border-bottom-color: #6567FA;
+	}
+
+	.swiper-box {
+		height: 100%;
+		margin-bottom: 6rpx;
+	}
+
+	.swiper-item {
+		flex-direction: row;
+	}
+
+	.scroll-v {
+		/* #ifndef MP-ALIPAY */
+		flex-direction: column;
+		/* #endif */
+		width: 750upx;
+	}
+
+
+	.bottom-menu {
+		flex-direction: row;
+		height: 82rpx;
+		background-color: rgba(255, 255, 255, 1);
+		justify-content: space-around;
+		align-items: center;
+	}
+
+	.menu-item {
+		font-size: 30rpx;
+		font-weight: 400;
+		color: rgba(75, 78, 250, 1);
+		flex: 1;
+		text-align: center;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.menu-line {
+		width: 1px;
+		height: 30rpx;
+		background-color: #4B4EFA;
+	}
+</style>

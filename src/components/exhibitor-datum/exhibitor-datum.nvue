@@ -1,0 +1,203 @@
+<!-- 展商详情中的合同-->
+<template>
+	<view class="exhibitor-details">
+		<original-point text="基本资料"></original-point>
+		<card-list>
+			<view class="exhibitor-item-material" slot="content">
+				<text class="exhibitor-item company">{{options.atrName}}</text>
+				<text class="exhibitor-item abbreviation" >简称：{{options.atrSName}}</text>
+				<text class="exhibitor-item num">展位号：{{options.bthCode}}</text>
+				<text class="exhibitor-item exhibitor-location">{{options.atrCountry}} {{options.atrProvince}} {{options.atrCity}}</text>
+				<view class="contact-way">
+					<view class="contact-way-phone">
+						<text class="iconfont contact-way">&#xe61b;</text>
+						<text class="contact-way">{{options.atrTel}}</text>
+					</view>
+					<view class="contact-way-mail" >
+						<text class="iconfont contact-mail-icon">&#xe64e;</text>
+						<text class="contact-way ">{{options.atrEmail}}</text>
+					</view>
+				</view>
+				<text class="exhibitor-item exhibitor-location">展商状态：{{options.atrFiStatu}}</text>
+				<text class="exhibitor-item">业务员：{{options.atrSaleName}}</text>
+			</view>
+		</card-list>
+		<original-point text="展商联系人资料"></original-point>
+		<view v-for="item in options.dataList" :key="item.id">
+			<card-list>
+				<view class="exhibitor-item-material" slot="content">
+					<view class="main-linkman" v-if="(item.psnType).indexOf('主联系人') != -1"><text class="main-linkman-tag" >主要联系人</text></view>
+					<view class="person-info">
+						<text class="linkman-item linkman-name">{{item.contactName}}</text>
+						<text class="linkman-item">&nbsp;{{item.dept}}&nbsp;</text>
+						<text class="linkman-item">{{item.position}}&nbsp;</text>
+						<text class="iconfont sex-man" v-if="item.gender =='先生'">&#xe651;</text>
+						<text class="iconfont sex-woman" v-if="item.gender =='女士'">&#xe650;</text>
+					</view>
+					<text class="linkman-location">{{item.psnCountry}} {{item.psnProvince}} {{item.psnCity}}</text>
+					<text class="location-details">地址：{{item.address}}</text>
+					<view class="contact-way">
+						<view class="contact-way-phone" >
+							<text class="iconfont contact-mail-icon">&#xe61b;</text>
+							<text class="contact-way">{{item.tele}}</text>
+						</view>
+						<view class="contact-way-mail">
+							<text class="iconfont contact-way">&#xe653;</text>
+							<text class="contact-way">{{item.mobile}}</text>
+						</view>
+					</view>
+				</view>
+			</card-list>
+		</view>
+		<view v-if="options.dataList.length ==0">
+		
+			<view class="exhibitor-item-material">
+				<no-data isHint="true" hint="暂无联系人"></no-data>
+			</view>
+		
+		</view>
+		
+	</view>
+</template>
+
+<script>
+import cardList from '@/components/card-list/card-list.nvue';
+import originalPoint from '@/components/original-point/original-point.nvue';
+import noData from "@/components/no-data/no-data.vue"
+export default {
+	components: {
+		cardList,
+		originalPoint,
+		noData
+	},
+	props: {
+		options: {
+			type: Object,
+			default: function(e) {
+				return {};
+			}
+		},
+		tabIndex: {
+			type: Number,
+			default: 0
+		}
+	},
+	data() {
+		return {
+			datumList:{}
+		};
+	},
+	onLoad() {
+		console.log(this.options)
+	   this.datumList = this.options;	
+	   console.log(this.datumList)
+	},
+	onReady() {
+		console.log(this.options)
+		
+	}
+};
+</script>
+
+<style>
+.exhibitor-details {
+	margin-right: 30rpx;
+	margin-left: 30rpx;
+}
+.exhibitor-item-material {
+	padding: 24rpx;
+	font-family: PingFangSC-Regular, PingFang SC;
+	color: rgba(0, 0, 0, 0.65);
+}
+.company {
+	font-size: 36rpx;
+	font-weight: 400;
+	color: rgba(0, 0, 0, 0.65);
+}
+.exhibitor-item {
+	margin-top: 8rpx;
+	font-size: 30rpx;
+	color: rgba(0, 0, 0, 0.65);
+}
+.exhibitor-location {
+	margin-top: 48rpx;
+}
+.contact-way {
+	flex-direction: row;
+	align-items: center;
+	font-size: 24rpx;
+}
+.contact-way-phone {
+	flex-direction: row;
+	align-items: center;
+}
+.contact-way-mail {
+	margin-left: 24rpx;
+	flex-direction: row;
+	align-items: center;
+	color: #007aff;
+}
+.main-linkman {
+	border-radius: 4rpx;
+	flex: 1;
+	align-items: flex-end;
+	margin-bottom: -20rpx;
+}
+.main-linkman-tag {
+	font-size: 22rpx;
+	font-family: PingFangSC-Regular, PingFang SC;
+	font-weight: 400;
+	background-color: rgba(247, 247, 255, 1);
+	color: rgba(75, 78, 250, 1);
+	padding-bottom: 5rpx;
+	padding-top: 5rpx;
+	width: 142rpx;
+	text-align: center;
+}
+.iconfont {
+	color: #a9a9a9;
+	font-size: 30rpx;
+	margin-right: 10rpx;
+}
+
+.person-info {
+	flex-direction: row;
+	align-items: flex-end;
+}
+.linkman-item {
+	font-size: 26rpx;
+	font-family: PingFangSC-Regular, PingFang SC;
+	font-weight: 400;
+	color: rgba(0, 0, 0, 0.65);
+}
+.linkman-name {
+	font-size: 36rpx;
+}
+.linkman-location {
+	margin-top: 8rpx;
+	font-size: 26rpx;
+}
+.location-details {
+	margin-top: 24rpx;
+	font-size: 26rpx;
+}
+.sex-man {
+	color: #4b4eff;
+	font-size: 20rpx;
+	padding-bottom: 8rpx;
+}
+.sex-woman {
+	color: #ff8bce;
+	font-size: 20rpx;
+	padding-bottom: 8rpx;
+	background-color: #ffffff;
+}
+.contact-mail-icon{
+	margin-top: 6rpx;
+}
+.exhibitor-item-material {
+	padding: 24rpx;
+	font-family: PingFangSC-Regular, PingFang SC;
+	color: rgba(0, 0, 0, 0.65);
+}
+</style>

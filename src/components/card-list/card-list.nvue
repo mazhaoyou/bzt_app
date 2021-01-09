@@ -1,0 +1,47 @@
+<!-- 实现边框圆角功能
+slot name="top" 为标题部分
+slot name="content" 为内容部分 -->
+ 
+<template>
+	<view>
+		<view class="card-list-title">
+			<slot name="top"></slot>
+		</view>
+		<view class="card-list-content">
+			<slot name="content"></slot>
+			<slot name="line"></slot>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		name: 'cardList',
+		data() {
+			return {
+
+			};
+		}
+	}
+</script>
+
+<style  scoped>
+	.card-list-title {
+		flex-direction: row;
+		margin-top: 16rpx;
+		background-color: rgba(255, 255, 255, 1);
+		border-radius: 10rpx;
+		align-items: center;
+		margin-bottom: 4rpx;
+	}
+
+	.card-list-content {
+		background-color: rgba(255, 255, 255, 1);
+		border-radius:8rpx;
+	}
+	.line-h{
+		height: 1rpx;
+		background-color: #007AFF;
+		width: 750rpx;
+	}
+</style>

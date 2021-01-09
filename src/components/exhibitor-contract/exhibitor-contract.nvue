@@ -1,0 +1,130 @@
+<!-- 展商详情中的合同 -->
+<template>
+	<view class="exhibitor-details">
+		<view v-if="options.odrCreateTime">
+			<card-list>
+				<view class="exhibitor-contract-titel" slot="top">
+					<text class="contract-date-title">合同日期</text>
+					<text class="contract-date-time">&nbsp;{{options.odrCreateTime | formatDate(11)}}</text>
+				</view>
+				<view class="exhibitor-item-material" slot="content">
+					<text class="contract-item headline">合同基本信息</text>
+					<text class="contract-item contract-name">合同名称：{{options.odrname}}</text>
+					<text class="contract-item customer-name">客户名称：{{options.odrComName}}</text>
+					<text class="contract-item-details">合同金额：{{options.odrMoney }}</text>
+					<text class="contract-item-details">已收金额：{{options.odrReceive | 0}}</text>
+					<text class="contract-item-details">业务员:{{options.stfFullName }}</text>
+					<view v-for="item in options.dataList" :key="item.odrid" v-if="options.dataList.length>0">
+						<text class="contract-item headline headlines ">合同项目信息</text>
+						<text class="contract-item">项目名称：{{item.oddsourceid }}</text>
+						<text class="contract-item">服务大类：{{item.oddsource }}</text>
+						<text class="contract-item">服务类别：{{item.oddTypName }}</text>
+						<text class="contract-item">单价：{{item.oddsaleprice }}</text>
+						<text class="contract-item">销售价格：{{item.oddprice }}</text>
+						<text class="contract-item">数量：{{item.oddnum }}</text>
+						<text class="contract-item">小计：{{item.oddEndPrice}}</text>
+					</view>
+
+				</view>
+			</card-list>
+		</view>
+		<view v-if="!options.odrCreateTime">
+				<view class="exhibitor-item-material">
+					<no-data isHint="true"></no-data>
+				</view>
+		</view>
+	</view>
+</template>
+
+<script>
+	import cardList from '@/components/card-list/card-list.nvue';
+	import noData from "@/components/no-data/no-data.vue"
+	export default {
+		components: {
+			cardList,
+			noData
+		},
+		props: {
+			options: {
+				type: Object,
+				default () {
+					return {};
+				}
+			},
+			tabIndex: {
+				type: Number,
+				default: 0
+			}
+		},
+		data() {
+			return {};
+		},
+		created() {}
+	};
+</script>
+
+<style>
+	.exhibitor-details {
+		margin-right: 30rpx;
+		margin-left: 30rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		margin-bottom: 24rpx;
+	}
+
+	.exhibitor-contract-titel {
+		flex-direction: row;
+		padding: 16rpx;
+		padding-right: 24rpx;
+		justify-content: flex-end;
+		flex: 1;
+		align-items: center;
+	}
+
+	.contract-date-title {
+		font-size: 22rpx;
+		font-weight: 400;
+		color: rgba(155, 155, 155, 1);
+	}
+
+	.contract-date-time {
+		font-size: 28rpx;
+		font-weight: 500;
+		color: rgba(0, 0, 0, 0.65);
+	}
+
+	.exhibitor-item-material {
+		padding: 24rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		color: rgba(0, 0, 0, 0.65);
+	}
+
+	.contract-item {
+		font-size: 30rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		color: rgba(0, 0, 0, 0.65);
+		margin-bottom: 8rpx;
+	}
+
+	.customer-name {
+		font-size: 30rpx;
+	}
+
+	.contract-item-details {
+		font-size: 24rpx;
+		font-family: PingFangSC-Regular, PingFang SC;
+		font-weight: 400;
+		color: rgba(0, 0, 0, 0.4);
+	}
+
+	.headline {
+		font-size: 28rpx;
+		font-weight: 500;
+		color: rgba(0, 0, 0, 0.65);
+		margin-bottom: 16rpx;
+	}
+
+	.headlines {
+		margin-top: 16rpx;
+	}
+</style>

@@ -1,0 +1,408 @@
+{
+	"pages": [
+		{
+			"path":"pages/launch/launch",
+			"style": {
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path": "pages/tabs/home/home",
+			"style": {
+				"navigationBarTitleText": "首页",
+				"app-plus": {
+					"titleNView": false,
+					"subNVues": [{
+							"id": "popup",
+							"path": "components/subnvue/popup",
+							"type": "popup",
+							"style": {
+								"margin": "auto",
+								"width": "80%",
+								"height": "600upx"
+							}
+						},
+						{
+							"id": "selectPop",
+							"path": "pages/tabs/home/exhibition-pop",
+							"type": "popup",
+							"style": {
+								"width": "100%",
+								"height": "300px"
+							}
+						}
+					]
+				}
+			}
+		},
+		{
+			"path": "pages/tabs/company/companyGroup",
+			"style": {
+				"navigationBarTitleText": "公海"
+			}
+		},
+		{
+			"path": "pages/tabs/exhibitor/exhibitor",
+			"style": {
+				"navigationBarTitleText": "展商",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"pullToRefresh": {
+						"style": "circle",
+						"offset": "150px",
+						"color":"#4B4EFA"
+					},
+					"bounce": "none",
+					"backgroundColor": "#4C59ED",
+					"scrollIndicator": "none",
+					"titleNView": {
+						"type": "transparent",
+						"buttons": [
+
+							{
+								"text": "新增",
+								"fontSize": "16",
+								"weight": "80",
+								"background": "rgba(0,0,0,0)"
+							},
+							{
+								"text": "搜索",
+								"fontSize": "16",
+								"weight": "80",
+								"background": "rgba(0,0,0,0)"
+							}
+						]
+						
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/tabs/report/report",
+			"style": {
+				"navigationBarTitleText": "报表",
+				"backgroundColor": "#F6F6F6",
+				"backgroundColorTop": "#F6F6F6",
+				"backgroundColorBottom": "#F6F6F6",
+				"disableScroll": true,
+				"app-plus": {
+					"titleNView": false,
+					"bounce": "none"
+					// "subNVues": [
+					// 	{
+					// 	    "id": "nav",
+					// 	    "path": "components/subnvue/nav",
+					// 	    "type": "navigationBar"
+					// 	}
+					// ]
+				}
+			}
+		},
+		{
+			"path": "pages/tabs/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"app-plus": {
+					"titleNView": {
+						"type": "transparent"
+					}
+				}
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"disableScroll": true,
+				"app-plus": {
+					"titleNView": false,
+					"bounce": "none",
+					"softinputNavBar": "none"
+				}
+			}
+		},
+		{ // 待办事项
+			"path": "pages/home/upcoming/upcoming",
+			"style": {
+				"navigationBarTitleText": "待办事项",
+				"backgroundColor": "#F6F6F6",
+				"backgroundColorTop": "#F6F6F6",
+				"backgroundColorBottom": "#F6F6F6",
+				"disableScroll": true,
+				"app-plus": {
+					"titleNView": {
+						"backgroundColor": "#4B4EFA"
+					},
+					"bounce": "none"
+				},
+				"nvue": {
+					"flex-direction": "row-reverse"
+				}
+			}
+		},
+		{
+			"path": "pages/exhibitor/exhibitor-detail",
+			"style": {
+				"app-plus": {
+					"navigationBarTitleText": "展商详情",
+					"bounce": "none",
+					"backgroundColorTop": "#fff",
+					"scrollIndicator": "none"
+				}
+			}
+		},
+		{
+			"path": "pages/exhibitor-search/exhibitor-search",
+			"style": {
+				"app-plus": {
+					"titleNView": {
+						"titleColor": "#fff",
+						"backgroundColor": "#4B4EFA",
+						"buttons": [{
+							"fontSize": "14",
+							"background": "rgba(0,0,0,0)",
+							"text": "取消",
+							"width": "50px"
+						}],
+						"searchInput": {
+							"borderRadius": "17px",
+							"placeholder": "请输入搜索内容",
+							"autoFocus": true,
+							"backgroundColor": "rgba(140,142,252,1)",
+							"placeholderColor": "rgba(255,255,255,1)"
+						}
+					}
+				}
+			}
+		}, {
+			"path": "pages/booth-search/booth-search",
+			"style": {
+				"app-plus": {
+					"titleNView": {
+						"titleColor": "#fff",
+						"backgroundColor": "#007AFF",
+						"buttons": [{
+							"fontSize": "14",
+							"background": "rgba(0,0,0,0)",
+							"text": "提交",
+							"width": "50px"
+						}],
+						"searchInput": {
+							"borderRadius": "20px",
+							"placeholder": "请输入搜索内容",
+							"autoFocus": true,
+							"backgroundColor": "rgba(140,142,252,1)"
+						}
+					}
+				}
+			}
+		},{
+			"path": "pages/append-contact/append-contact",
+			"style": {
+				"navigationBarTitleText": "新增联络",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"fontSize": "14",
+							"background": "rgba(0,0,0,0)",
+							"text": "保存",
+							"width": "50px"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/reserve-booth/reserve-booth",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"pullToRefresh": {
+						"style": "circle",
+						"offset": "150px",
+						"color":"#4B4EFA"
+					},
+					"titleNView": {
+						"buttons": [{
+								"text": "提交",
+								"fontSize": "16",
+								"background": "rgba(0,0,0,0)",
+								"weight": "100px"
+							},
+							{
+								"text": "新增",
+								"fontSize": "16",
+								"background": "rgba(0,0,0,0)",
+								"weight": "100px"
+							},
+							{
+								"text": "搜索",
+								"fontSize": "16",
+								"background": "rgba(0,0,0,0)",
+								"weight": "100px"
+							}
+						]
+					}
+				}
+			}
+		}, {
+			"path": "pages/editorial-material/editorial-material",
+			"navigationBarTitleText": "编辑资料",
+			"style": {
+
+			}
+		}, {
+			"path": "pages/append-liaisons/append-liaisons",
+			"style": {
+				"navigationBarTitleText": "新增联络人",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"fontSize": "14",
+							"background": "rgba(0,0,0,0)",
+							"text": "保存",
+							"width": "50px"
+						}]
+
+					}
+				}
+			}
+		}, {
+			"path": "pages/reserve-service/reserve-service",
+			"style": {
+				"navigationBarTitleText": "预订服务",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"fontSize": "14",
+							"background": "rgba(0,0,0,0)",
+							"text": "提交",
+							"width": "50px"
+						}]
+				
+					}
+				}
+			}
+		}, {
+			"path": "pages/contract-management/contract-management",
+			"style": {
+				"navigationBarTitleText": "合同管理",
+				"enablePullDownRefresh": true,
+				"app-plus":{
+					"bounce": "none",
+					"pullToRefresh": {
+						"style": "circle",
+						"offset": "150px",
+						"color":"#4B4EFA"
+					}
+				}
+			}
+		}, {
+			"path": "pages/append-exhibitor/append-exhibitor",
+			"style": {
+				"navigationBarTitleText": "新增展商",
+				"app-plus": {
+					"scrollIndicator": "none",
+					"titleNView": {
+						"buttons": [{
+							"fontSize": "14",
+							"background": "rgba(0,0,0,0)",
+							"text": "保存",
+							"width": "50px"
+						}]
+					}
+				}
+			}
+		}, {
+			"path": "pages/append-booth/append-booth",
+			"style": {
+				"navigationBarTitleText": "新增展位",
+				"app-plus": {
+					"titleNView": {
+						"buttons": [{
+							"fontSize": "14",
+							"background": "rgba(0,0,0,0)",
+							"text": "提交",
+							"width": "50px"
+						}]
+					}
+				}
+			}
+		}
+	    ,{
+            "path" : "pages/select-exhibition/select-exhibition",
+            "style" : {
+				"navigationBarTitleText":"选择展会",
+				// #ifdef H5 
+				"navigationStyle":"custom",
+				 //#endif
+				"disableScroll": true,
+				"app-plus":{
+					"bounce": "none",
+					"titleNView":{
+						"type":"transparent"
+					}
+				}
+			}
+        }
+        ,{
+            "path" : "pages/exhibitor/exhibitor",
+            "style" : {
+				"app-plus": {
+					"navigationBarTitleText": "展商详情",
+					"bounce": "none",
+					"backgroundColorTop": "#fff",
+					"scrollIndicator": "none"
+				}
+			}
+        }
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "B展通",
+		"navigationBarBackgroundColor": "#4B4EFA",
+		"backgroundColor": "#F8F8F8",
+		"app-plus":{
+			"scrollIndicator": "none"
+		}
+	},
+	"tabBar": {
+		"color": "rgba(0,0,0,0.65)",
+		"selectedColor": "rgba(0,0,0,0.65)",
+		"fontSize": "11px",
+		"borderStyle": "white",
+		"backgroundColor": "#FFFFFF",
+		"list": [{
+				"pagePath": "pages/tabs/home/home",
+				"iconPath": "static/home.png",
+				"selectedIconPath": "static/homeHL.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/tabs/exhibitor/exhibitor",
+				"iconPath": "static/exhibitor.png",
+				"selectedIconPath": "static/exhibitorHL.png",
+				"text": "展商"
+			}, {
+				"pagePath": "pages/tabs/report/report",
+				"iconPath": "static/report.png",
+				"selectedIconPath": "static/reportHL.png",
+				"text": "报表"
+			}, {
+				"pagePath": "pages/tabs/mine/mine",
+				"iconPath": "static/mine.png",
+				"selectedIconPath": "static/mineHL.png",
+				"text": "我的"
+			}
+		],
+		"condition": { //模式配置，仅开发期间生效
+			"current": 4, //当前激活的模式（list 的索引项）
+			"list": [{
+				"name": "test", //模式名称
+				"path": "pages/exhibitor/exhibitor-detail" //启动页面，必选
+			}]
+		}
+	}
+}
